@@ -2,6 +2,7 @@ from llm import LLM
 from data import Dataset
 import tools
 from app.const import STSTEM_PROMPT_FILE_PATH
+import json
 
 
 def process_user_query(user_query: str, ds: Dataset) -> dict:
@@ -23,41 +24,61 @@ def process_user_query(user_query: str, ds: Dataset) -> dict:
         messages, tools=tools.tools, tool_choice="auto", parallel_tool_calls=True
     )
 
-    # Get the response
     assistant_message = response.choices[0].message
-    results = []
 
-    # Check if there's a function call
-    if assistant_message.tool_calls:
+    while assistant_message.tool_calls:
         print("total function calls: ", len(assistant_message.tool_calls))
+
         for function in assistant_message.tool_calls:
             function_call = function.function
-            function_name = function_call.name
+            messages.append(function_call)
+
             arguments = json.loads(function_call.arguments)
 
-            # Add the function_type to the arguments for discriminated union
+            function_name = function_call.name
             arguments["function_type"] = function_name
 
-            # Parse the input with Pydantic
             try:
-                function_input = FunctionInput(function_call=arguments)
-                result = execute_function(function_input)
+                function_input = tools.FunctionInput(function_call=arguments)
+                function_output, ds = tools.execute_function(function_input, ds)
 
-                # For demonstration, show what happened
                 print(f"User query: {user_query}")
                 print(f"Function called: {function_name}")
                 print(f"Arguments: {arguments}")
-                print(f"Result: {json.dumps(result, indent=2)}")
-                results.append(result)
+                print(f"Result: {json.dumps(function_output, indent=2)}")
+
+                messages.append(
+                    {
+                        "type": "function_call_output",
+                        "call_id": function_call.call_id,
+                        "output": json.dumps(function_output),
+                    }
+                )
+
             except Exception as e:
                 error_msg = f"Error processing function call: {str(e)}"
                 print(error_msg)
-                results.append({"error": error_msg})
-    else:
-        # If no function was called, return the assistant's message
-        print(f"User query: {user_query}")
-        print("No function was called. Assistant response:")
-        print(assistant_message.content)
-        results.append(assistant_message.content)
+                messages.append(
+                    {
+                        "type": "function_call_error",
+                        "call_id": function_call.call_id,
+                        "error": error_msg,
+                    }
+                )
 
-    return results
+            print(f"Updated messages: {messages}")
+
+        # response = LLM.perform_request(
+        #                     messages, tools=tools.tools, tool_choice="auto", parallel_tool_calls=True
+        #             )
+        # assistant_message = response.choices[0].message
+        break
+
+    # else:
+    #     # If no function was called, return the assistant's message
+    #     print(f"User query: {user_query}")
+    #     print("No function was called. Assistant response:")
+    #     print(assistant_message.content)
+    #     results.append(assistant_message.content)
+
+    # return results
