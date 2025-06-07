@@ -29,53 +29,71 @@ def process_user_query(user_query: str, ds: Dataset) -> dict:
     while assistant_message.tool_calls:
         print("total function calls: ", len(assistant_message.tool_calls))
 
+        messages.append(
+            {
+                "role": "assistant",
+                "content": None,
+                "tool_calls": [
+                    {
+                        "id": tc.id,
+                        "type": tc.type,
+                        "function": {
+                            "name": tc.function.name,
+                            "arguments": tc.function.arguments,
+                        },
+                    }
+                    for tc in assistant_message.tool_calls
+                ],
+            }
+        )
+
         for function in assistant_message.tool_calls:
 
             print(f"Processing function call: {function}")
 
-            # function_call = function.function
-            # messages.append(function_call)
+            function_call = function.function
+            arguments = json.loads(function_call.arguments)
 
-            # arguments = json.loads(function_call.arguments)
+            function_name = function.function.name
 
-            # function_name = function_call.name
-            # arguments["function_type"] = function_name
+            try:
+                function_input = tools.FunctionInput(function_call=arguments)
+                output = tools.execute_function(function_input.function_call, ds)
 
-            # try:
-            #     function_input = tools.FunctionInput(function_call=arguments)
-            #     function_output, ds = tools.execute_function(function_input, ds)
+                function_output = output["response"]
+                ds = output["dataset"]
 
-            #     print(f"User query: {user_query}")
-            #     print(f"Function called: {function_name}")
-            #     print(f"Arguments: {arguments}")
-            #     print(f"Result: {json.dumps(function_output, indent=2)}")
+                print(f"User query: {user_query}")
+                print(f"Function called: {function_name}")
+                print(f"Arguments: {arguments}")
+                print(f"Result: {json.dumps(function_output, indent=2)}")
 
-            #     messages.append(
-            #         {
-            #             "type": "function_call_output",
-            #             "call_id": function_call.call_id,
-            #             "output": json.dumps(function_output),
-            #         }
-            #     )
+                messages.append(
+                    {
+                        "role": "tool",
+                        "tool_call_id": function.id,
+                        "content": json.dumps(function_output),
+                    }
+                )
 
-            # except Exception as e:
-            #     error_msg = f"Error processing function call: {str(e)}"
-            #     print(error_msg)
-            #     messages.append(
-            #         {
-            #             "type": "function_call_error",
-            #             "call_id": function_call.call_id,
-            #             "error": error_msg,
-            #         }
-            #     )
+            except Exception as e:
+                error_msg = f"Error processing function call: {str(e)}"
+                print(error_msg)
 
-            # print(f"Updated messages: {messages}")
+                messages.append(
+                    {
+                        "role": "tool",
+                        "tool_call_id": function.id,
+                        "content": f"Tool call failed: {error_msg}",
+                    }
+                )
 
-        # response = LLM.perform_request(
-        #                     messages, tools=tools.tools, tool_choice="auto", parallel_tool_calls=True
-        #             )
-        # assistant_message = response.choices[0].message
-        break
+            print(f"Updated messages: {messages}")
+
+        response = LLM.perform_request(
+            messages, tools=tools.tools, tool_choice="auto", parallel_tool_calls=True
+        )
+        assistant_message = response.choices[0].message
 
     # else:
     #     # If no function was called, return the assistant's message

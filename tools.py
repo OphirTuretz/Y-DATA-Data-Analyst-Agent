@@ -255,17 +255,17 @@ tools = [
             "parameters": ShowExamplesInput.model_json_schema(),
         },
     },
-    {
-        "type": "function",
-        "function": {
-            "name": "summarize",
-            "description": (
-                "Summarize a user request using the dataset. "
-                "The user request is provided as input."
-            ),
-            "parameters": SummarizeInput.model_json_schema(),
-        },
-    },
+    # {
+    #     "type": "function",
+    #     "function": {
+    #         "name": "summarize",
+    #         "description": (
+    #             "Summarize a user request using the dataset. "
+    #             "The user request is provided as input."
+    #         ),
+    #         "parameters": SummarizeInput.model_json_schema(),
+    #     },
+    # },
     {
         "type": "function",
         "function": {
