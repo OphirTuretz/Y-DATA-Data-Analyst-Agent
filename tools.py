@@ -180,3 +180,98 @@ def execute_function(function_call: FunctionType, ds: Dataset):
         return output
     else:
         raise ValueError(f"Unknown function type: {function_call.function_type}")
+
+
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "get_possible_intents",
+            "description": "Get a list of possible intents from the dataset",
+            "parameters": GetPossibleIntentsInput.model_json_schema(),
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_possible_categories",
+            "description": "Get a list of possible categories from the dataset",
+            "parameters": GetPossibleCategoriesInput.model_json_schema(),
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "select_semantic_intent",
+            "description": "Select rows from the dataset where the 'intent' column matches any of the provided intent names",
+            "parameters": SelectSemanticIntentInput.model_json_schema(),
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "select_semantic_category",
+            "description": "Select rows from the dataset where the 'category' column matches any of the provided category names",
+            "parameters": SelectSemanticCategoryInput.model_json_schema(),
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "count_rows",
+            "description": "Count the number of rows in the dataset",
+            "parameters": CountRowsInput.model_json_schema(),
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "sum",
+            "description": "Sum two numbers",
+            "parameters": SumInput.model_json_schema(),
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "count_category",
+            "description": "Count the number of rows in the dataset that match a specific category",
+            "parameters": CountCategoryInput.model_json_schema(),
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "count_intent",
+            "description": "Count the number of rows in the dataset that match a specific intent",
+            "parameters": CountIntentInput.model_json_schema(),
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "show_examples",
+            "description": "Show a number of examples from the dataset",
+            "parameters": ShowExamplesInput.model_json_schema(),
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "summarize",
+            "description": (
+                "Summarize a user request using the dataset. "
+                "The user request is provided as input."
+            ),
+            "parameters": SummarizeInput.model_json_schema(),
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "finish",
+            "description": "Finish the conversation with a final answer",
+            "parameters": FinishInput.model_json_schema(),
+        },
+    },
+]

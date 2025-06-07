@@ -2,6 +2,7 @@ from app.const import MODEL_NAME, BASE_URL, TEMPERATURE, TOP_P
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
+from typing import List
 
 load_dotenv()  # Load environment variables from .env file
 
@@ -10,14 +11,14 @@ class LLM:
 
     @staticmethod
     def perform_request(
-        messages,
-        base_url=BASE_URL,
-        model=MODEL_NAME,
-        temperature=TEMPERATURE,
-        top_p=TOP_P,
-        tools=None,
-        tool_choice=None,
-        parallel_tool_calls=False,
+        messages: List[dict],
+        base_url: str = BASE_URL,
+        model: str = MODEL_NAME,
+        temperature: float = TEMPERATURE,
+        top_p: float = TOP_P,
+        tools: List[dict] = None,
+        tool_choice: str = None,
+        parallel_tool_calls: bool = False,
     ):
 
         # Initialize OpenAI client
