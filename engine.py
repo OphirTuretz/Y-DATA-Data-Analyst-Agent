@@ -30,43 +30,46 @@ def process_user_query(user_query: str, ds: Dataset) -> dict:
         print("total function calls: ", len(assistant_message.tool_calls))
 
         for function in assistant_message.tool_calls:
-            function_call = function.function
-            messages.append(function_call)
 
-            arguments = json.loads(function_call.arguments)
+            print(f"Processing function call: {function}")
 
-            function_name = function_call.name
-            arguments["function_type"] = function_name
+            # function_call = function.function
+            # messages.append(function_call)
 
-            try:
-                function_input = tools.FunctionInput(function_call=arguments)
-                function_output, ds = tools.execute_function(function_input, ds)
+            # arguments = json.loads(function_call.arguments)
 
-                print(f"User query: {user_query}")
-                print(f"Function called: {function_name}")
-                print(f"Arguments: {arguments}")
-                print(f"Result: {json.dumps(function_output, indent=2)}")
+            # function_name = function_call.name
+            # arguments["function_type"] = function_name
 
-                messages.append(
-                    {
-                        "type": "function_call_output",
-                        "call_id": function_call.call_id,
-                        "output": json.dumps(function_output),
-                    }
-                )
+            # try:
+            #     function_input = tools.FunctionInput(function_call=arguments)
+            #     function_output, ds = tools.execute_function(function_input, ds)
 
-            except Exception as e:
-                error_msg = f"Error processing function call: {str(e)}"
-                print(error_msg)
-                messages.append(
-                    {
-                        "type": "function_call_error",
-                        "call_id": function_call.call_id,
-                        "error": error_msg,
-                    }
-                )
+            #     print(f"User query: {user_query}")
+            #     print(f"Function called: {function_name}")
+            #     print(f"Arguments: {arguments}")
+            #     print(f"Result: {json.dumps(function_output, indent=2)}")
 
-            print(f"Updated messages: {messages}")
+            #     messages.append(
+            #         {
+            #             "type": "function_call_output",
+            #             "call_id": function_call.call_id,
+            #             "output": json.dumps(function_output),
+            #         }
+            #     )
+
+            # except Exception as e:
+            #     error_msg = f"Error processing function call: {str(e)}"
+            #     print(error_msg)
+            #     messages.append(
+            #         {
+            #             "type": "function_call_error",
+            #             "call_id": function_call.call_id,
+            #             "error": error_msg,
+            #         }
+            #     )
+
+            # print(f"Updated messages: {messages}")
 
         # response = LLM.perform_request(
         #                     messages, tools=tools.tools, tool_choice="auto", parallel_tool_calls=True
