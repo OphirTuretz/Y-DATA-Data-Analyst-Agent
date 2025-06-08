@@ -15,9 +15,9 @@ def process_user_query(
     user_query: str,
     ds: Dataset,
     log_function: Callable[[str], None] = log_to_console,
-    tools=tools.tools,
-    tool_choice="auto",
-    parallel_tool_calls=True,
+    llm_tools=tools.tools,
+    llm_tool_choice="auto",
+    llm_parallel_tool_calls=True,
 ):
 
     # Load the system prompt from the file
@@ -39,9 +39,9 @@ def process_user_query(
     # Perform the initial request to the LLM
     response = LLM.perform_request(
         messages,
-        tools=tools,
-        tool_choice=tool_choice,
-        parallel_tool_calls=parallel_tool_calls,
+        tools=llm_tools,
+        tool_choice=llm_tool_choice,
+        parallel_tool_calls=llm_parallel_tool_calls,
     )
 
     # Log the response from the LLM
@@ -92,6 +92,13 @@ def process_user_query(
                 function_output = output["response"]
                 ds = output["dataset"]
 
+                if function_output.get("final_answer"):
+                    # If the function output contains a final answer, return it
+                    return {
+                        "response": function_output["final_answer"],
+                        "dataset": ds,
+                    }
+
                 # Set the function output to be added to the messages
                 function_message = {
                     "role": "tool",
@@ -117,19 +124,12 @@ def process_user_query(
             # Log the function call message added to the conversation
             log_function(f"Function call message added: {function_message}")
 
-            if function_output.get("final_answer"):
-                # If the function output contains a final answer, return it
-                return {
-                    "response": function_output["final_answer"],
-                    "dataset": ds,
-                }
-
         # Perform the next request to the LLM with the updated messages
         response = LLM.perform_request(
             messages,
-            tools=tools,
-            tool_choice=tool_choice,
-            parallel_tool_calls=parallel_tool_calls,
+            tools=llm_tools,
+            tool_choice=llm_tool_choice,
+            parallel_tool_calls=llm_parallel_tool_calls,
         )
 
         # Log the response from the LLM
