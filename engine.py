@@ -34,7 +34,7 @@ def process_user_query(
     ]
 
     # Log the initial messages
-    log_function(f"Initial messages: {messages}")
+    log_function(f"Initial messages: {json.dumps(messages, indent=2)}")
 
     # Perform the initial request to the LLM
     response = LLM.perform_request(
@@ -45,7 +45,7 @@ def process_user_query(
     )
 
     # Log the response from the LLM
-    log_function(f"Response from LLM: {response}")
+    log_function(f"Response from LLM: {json.dumps(response.model_dump(), indent=2)}")
 
     # Extract the assistant's message from the response
     assistant_message = response.choices[0].message
@@ -72,10 +72,12 @@ def process_user_query(
         messages.append(tool_calls_messages)
 
         # Log the number of tool calls
-        log_function(f"Total function calls: {len(assistant_message.tool_calls)}")
+        log_function(f"Total tool calls: {len(assistant_message.tool_calls)}")
 
         # Log the tool calls messages added to the conversation
-        log_function(f"Tool calls messages added: {tool_calls_messages}")
+        log_function(
+            f"Tools calls messages added: {json.dumps(tool_calls_messages, indent=2)}"
+        )
 
         # Process each function call in the assistant's message
         for function in assistant_message.tool_calls:
@@ -122,7 +124,9 @@ def process_user_query(
             messages.append(function_message)
 
             # Log the function call message added to the conversation
-            log_function(f"Function call message added: {function_message}")
+            log_function(
+                f"Tool call output message added: {json.dumps(function_message, indent=2)}"
+            )
 
         # Perform the next request to the LLM with the updated messages
         response = LLM.perform_request(
@@ -133,7 +137,9 @@ def process_user_query(
         )
 
         # Log the response from the LLM
-        log_function(f"Response from LLM: {response}")
+        log_function(
+            f"Response from LLM: {json.dumps(response.model_dump(), indent=2)}"
+        )
 
         # Extract the assistant's message from the response
         assistant_message = response.choices[0].message
