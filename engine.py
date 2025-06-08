@@ -3,9 +3,17 @@ from data import Dataset
 import tools
 from app.const import STSTEM_PROMPT_FILE_PATH
 import json
+from typing import Callable
 
 
-def process_user_query(user_query: str, ds: Dataset) -> dict:
+def log_to_console(message: str) -> None:
+    """Logs a message to the console."""
+    print(message)
+
+
+def process_user_query(
+    user_query: str, ds: Dataset, log_function: Callable[[str], None] = log_to_console
+) -> dict:
 
     # Load the system prompt from the file
     with open(STSTEM_PROMPT_FILE_PATH, "r", encoding="utf-8") as f:
@@ -27,7 +35,7 @@ def process_user_query(user_query: str, ds: Dataset) -> dict:
     assistant_message = response.choices[0].message
 
     while assistant_message.tool_calls:
-        print("total function calls: ", len(assistant_message.tool_calls))
+        log_function(f"total function calls: {len(assistant_message.tool_calls)}")
 
         messages.append(
             {
@@ -49,7 +57,7 @@ def process_user_query(user_query: str, ds: Dataset) -> dict:
 
         for function in assistant_message.tool_calls:
 
-            print(f"Processing function call: {function}")
+            log_function(f"Processing function call: {function}")
 
             function_call = function.function
             arguments = json.loads(function_call.arguments)
@@ -63,10 +71,10 @@ def process_user_query(user_query: str, ds: Dataset) -> dict:
                 function_output = output["response"]
                 ds = output["dataset"]
 
-                print(f"User query: {user_query}")
-                print(f"Function called: {function_name}")
-                print(f"Arguments: {arguments}")
-                print(f"Result: {json.dumps(function_output, indent=2)}")
+                log_function(f"User query: {user_query}")
+                log_function(f"Function called: {function_name}")
+                log_function(f"Arguments: {arguments}")
+                log_function(f"Result: {json.dumps(function_output, indent=2)}")
 
                 messages.append(
                     {
@@ -78,7 +86,7 @@ def process_user_query(user_query: str, ds: Dataset) -> dict:
 
             except Exception as e:
                 error_msg = f"Error processing function call: {str(e)}"
-                print(error_msg)
+                log_function(error_msg)
 
                 messages.append(
                     {
@@ -88,7 +96,7 @@ def process_user_query(user_query: str, ds: Dataset) -> dict:
                     }
                 )
 
-            print(f"Updated messages: {messages}")
+            log_function(f"Updated messages: {messages}")
 
         response = LLM.perform_request(
             messages, tools=tools.tools, tool_choice="auto", parallel_tool_calls=True
@@ -97,9 +105,9 @@ def process_user_query(user_query: str, ds: Dataset) -> dict:
 
     # else:
     #     # If no function was called, return the assistant's message
-    #     print(f"User query: {user_query}")
-    #     print("No function was called. Assistant response:")
-    #     print(assistant_message.content)
+    #     log_function(f"User query: {user_query}")
+    #     log_function("No function was called. Assistant response:")
+    #     log_function(assistant_message.content)
     #     results.append(assistant_message.content)
 
     # return results

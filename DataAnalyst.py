@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from data import Dataset
+from engine import process_user_query
 
 # Page config
 st.set_page_config(page_title="Data Analyst Agent", layout="centered")
@@ -13,6 +14,8 @@ developer_mode = st.sidebar.checkbox("Developer Mode")
 def log(message):
     if developer_mode:
         st.sidebar.text(message)
+    else:
+        print(message)
 
 
 # Cache dataset loading
@@ -41,9 +44,8 @@ with col1:
             log(f"User asked: {user_query}")
 
             # Placeholder response logic
-            response = (
-                f"(This is where the agent would answer your question: '{user_query}')"
-            )
+            # (f"(This is where the agent would answer your question: '{user_query}')")
+            response = process_user_query(user_query, st.session_state.data, log)
 
             st.session_state.response = response
             log(f"Generated response: {response}")
