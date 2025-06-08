@@ -34,7 +34,10 @@ if "response" not in st.session_state:
     st.session_state.response = ""
 
 # User input
-user_query = st.text_input("Ask a question about the dataset:", key="user_query")
+# user_query = st.text_input("Ask a question about the dataset:", key="user_query")
+user_query = st.text_area(
+    "Ask a question about the dataset:", key="user_query", height=100
+)
 
 # Buttons
 col1, col2 = st.columns([1, 1])
