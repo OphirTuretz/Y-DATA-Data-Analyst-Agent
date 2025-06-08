@@ -48,7 +48,10 @@ with col1:
 
             # Placeholder response logic
             # (f"(This is where the agent would answer your question: '{user_query}')")
-            response = process_user_query(user_query, st.session_state.data, log)
+            output = process_user_query(user_query, st.session_state.data, log)
+
+            response = output["response"]
+            st.session_state.data = output["dataset"]
 
             st.session_state.response = response
             log(f"Generated response: {response}")
