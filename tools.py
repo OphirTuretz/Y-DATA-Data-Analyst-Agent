@@ -42,14 +42,17 @@ def finish(final_answer: str) -> str:
 
 
 class GetPossibleIntentsInput(BaseModel):
+    resoning: str = Field(..., description="Reasoning for the function call.")
     function_type: Literal["get_possible_intents"]
 
 
 class GetPossibleCategoriesInput(BaseModel):
+    resoning: str = Field(..., description="Reasoning for the function call.")
     function_type: Literal["get_possible_categories"]
 
 
 class SelectSemanticIntentInput(BaseModel):
+    resoning: str = Field(..., description="Reasoning for the function call.")
     function_type: Literal["select_semantic_intent"]
     intent_names: List[str] = Field(
         ..., description="List of intent names to filter by."
@@ -57,6 +60,7 @@ class SelectSemanticIntentInput(BaseModel):
 
 
 class SelectSemanticCategoryInput(BaseModel):
+    resoning: str = Field(..., description="Reasoning for the function call.")
     function_type: Literal["select_semantic_category"]
     category_names: List[str] = Field(
         ..., description="List of category names to filter by."
@@ -64,37 +68,44 @@ class SelectSemanticCategoryInput(BaseModel):
 
 
 class SumInput(BaseModel):
+    resoning: str = Field(..., description="Reasoning for the function call.")
     function_type: Literal["sum"]
     a: int = Field(..., description="First number to sum.")
     b: int = Field(..., description="Second number to sum.")
 
 
 class CountCategoryInput(BaseModel):
+    resoning: str = Field(..., description="Reasoning for the function call.")
     function_type: Literal["count_category"]
     category: str = Field(..., description="Category to count in the DataFrame.")
 
 
 class CountIntentInput(BaseModel):
+    resoning: str = Field(..., description="Reasoning for the function call.")
     function_type: Literal["count_intent"]
     intent: str = Field(..., description="Intent to count in the DataFrame.")
 
 
 class ShowExamplesInput(BaseModel):
+    resoning: str = Field(..., description="Reasoning for the function call.")
     function_type: Literal["show_examples"]
     n: int = Field(..., description="Number of examples to show from the DataFrame.")
 
 
 class SummarizeInput(BaseModel):
+    resoning: str = Field(..., description="Reasoning for the function call.")
     function_type: Literal["summarize"]
     user_request: str = Field(..., description="User request to summarize.")
 
 
 class FinishInput(BaseModel):
+    resoning: str = Field(..., description="Reasoning for the function call.")
     function_type: Literal["finish"]
     final_answer: str = Field(..., description="Final answer to return.")
 
 
 class CountRowsInput(BaseModel):
+    resoning: str = Field(..., description="Reasoning for the function call.")
     function_type: Literal["count_rows"]
 
 
