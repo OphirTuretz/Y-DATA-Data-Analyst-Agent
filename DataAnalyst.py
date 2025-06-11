@@ -9,7 +9,7 @@ st.title("🤖 Data Analyst Agent")
 
 
 # Cache dataset loading
-@st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner="Loading dataset, please wait...")
 def load_bitext_dataset():
     ds = Dataset()
     return ds
@@ -37,8 +37,7 @@ def log(message):
 
 # Initialize session state for data and messages
 if "data" not in st.session_state:
-    with st.spinner("Loading dataset, please wait..."):
-        st.session_state.data = load_bitext_dataset()
+    st.session_state.data = load_bitext_dataset()
     log("Dataset loaded and cached.")
 
 
