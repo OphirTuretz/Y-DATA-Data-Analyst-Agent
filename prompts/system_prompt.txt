@@ -47,7 +47,7 @@ Follow these guidelines:
 
 **Observation:** 1548
 
-**Action:** finish(final_answer="We received 1,548 refund requests.")
+**Action:** finish(function_type = "finish", final_answer="We received 1,548 refund requests.")
 
 ---
 
@@ -57,4 +57,4 @@ Follow these guidelines:
 
 **Thought:** This question is not related to customer support.
 
-**Action:** finish(final_answer="I'm only able to answer questions related to the Bitext Customer Support dataset.")
+**Action:** finish(function_type = "finish", final_answer="I'm only able to answer questions related to the Bitext Customer Support dataset.")
