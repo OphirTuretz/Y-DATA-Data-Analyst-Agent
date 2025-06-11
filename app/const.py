@@ -1,5 +1,7 @@
 import os
 
+DATE_TIME_PATTERN = "%H:%M:%S"
+
 DATASET_NAME = "bitext/Bitext-customer-support-llm-chatbot-training-dataset"
 SPLIT = "train"
 

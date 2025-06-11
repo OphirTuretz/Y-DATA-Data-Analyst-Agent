@@ -35,15 +35,9 @@ Follow these guidelines:
 
 **Observation:** ['[REPLACE_WITH_ACTUAL_INTENT]', ...]
 
-**Thought:** '[REPLACE_WITH_ACTUAL_INTENT]' best matches refund requests.
+**Thought:** '[REPLACE_WITH_ACTUAL_INTENT]' best matches refund requests. I will now count the rows.
 
-**Action:** select_semantic_intent(intent_names=["[REPLACE_WITH_ACTUAL_INTENT]"])
-
-**Observation:** 1548 rows selected
-
-**Thought:** I will now count the rows.
-
-**Action:** count_rows
+**Action:** count_intent("[REPLACE_WITH_ACTUAL_INTENT]")
 
 **Observation:** 1548
 

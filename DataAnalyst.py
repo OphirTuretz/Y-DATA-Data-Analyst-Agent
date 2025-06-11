@@ -1,6 +1,8 @@
 import streamlit as st
 from data import Dataset
 from engine import process_user_query
+from datetime import datetime
+from app.const import DATE_TIME_PATTERN
 
 # Page config
 st.set_page_config(page_title="Data Analyst Agent", layout="centered")
@@ -32,6 +34,7 @@ if st.session_state.developer_mode:
 
 
 def log(message, print_to_sidebar=True):
+    message = f"[{datetime.now().strftime(DATE_TIME_PATTERN)}] {message}"
     st.session_state.logs.append(message)
     print(message)
 
