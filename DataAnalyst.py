@@ -24,25 +24,20 @@ if "submitted" not in st.session_state:
 if "logs" not in st.session_state:
     st.session_state.logs = []
 
-
-def developer_mode_change():
-    if st.session_state.developer_mode:
-        for message in st.session_state.logs:
-            st.sidebar.text(message)
-
-
 # Developer mode checkbox
-developer_mode = st.sidebar.checkbox(
-    "Developer Mode", value=False, key="developer_mode", on_change=developer_mode_change
-)
+st.sidebar.checkbox("Developer Mode", value=False, key="developer_mode")
 
-
-def log(message):
-    st.session_state.logs.append(message)
-    if st.session_state.developer_mode:
+if st.session_state.developer_mode:
+    for message in st.session_state.logs:
         st.sidebar.text(message)
-    else:
-        print(message)
+
+
+def log(message, print_to_sidebar=True):
+    st.session_state.logs.append(message)
+    print(message)
+
+    if st.session_state.developer_mode and print_to_sidebar:
+        st.sidebar.text(message)
 
 
 # Initialize session state for data and messages
@@ -78,10 +73,7 @@ def on_reset_click():
     st.session_state.response = ""
     st.session_state.submitted = False
 
-    # Optionally clear developer_mode checkbox as well:
-    # st.session_state.developer_mode = True
-
-    log("The user wants to ask new question. App state was reset.")
+    log("App state was reset (follwing user request).", print_to_sidebar=False)
 
 
 if st.session_state.submitted:
@@ -96,7 +88,7 @@ if st.session_state.submitted:
 
             st.session_state.data = output["dataset"]
             st.session_state.response = output["response"]
-            log(f"Generated response: {st.session_state.response}")
+            log(f"Generated response: '{st.session_state.response}'")
 
     st.markdown("### 💬 Agent Response")
     st.write(st.session_state.response)
@@ -105,7 +97,7 @@ if st.session_state.submitted:
 
 
 # Optional developer info dump
-if developer_mode:
+if st.session_state.developer_mode:
     with st.expander("Session State", expanded=False):
         st.json(dict(st.session_state))
 
