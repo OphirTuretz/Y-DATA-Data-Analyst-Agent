@@ -31,13 +31,13 @@ Follow these guidelines:
 
 **Thought:** I should find which intent corresponds to refund requests.
 
-**Action:** get_possible_intents
+**Action:** get_possible_intents(function_type = "get_possible_intents", reasoning = "I should find which intent corresponds to refund requests.")
 
 **Observation:** ['[REPLACE_WITH_ACTUAL_INTENT]', ...]
 
 **Thought:** '[REPLACE_WITH_ACTUAL_INTENT]' best matches refund requests. I will now count the rows.
 
-**Action:** count_intent("[REPLACE_WITH_ACTUAL_INTENT]")
+**Action:** count_intent(function_type="count_intent", intent= "[REPLACE_WITH_ACTUAL_INTENT]", reasoning="'[REPLACE_WITH_ACTUAL_INTENT]' best matches refund requests. I will now count the rows.")
 
 **Observation:** 1548
 

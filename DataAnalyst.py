@@ -86,6 +86,7 @@ if st.session_state.submitted:
                 st.session_state.user_query,
                 st.session_state.data,
                 log,
+                llm_parallel_tool_calls=True,
             )
 
             st.session_state.data = output["dataset"]
