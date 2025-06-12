@@ -4,6 +4,7 @@ import tools
 from app.const import STSTEM_PROMPT_FILE_PATH
 import json
 from typing import Callable
+from prompt import read_prompt_file
 
 
 def log_to_console(message: str) -> None:
@@ -21,8 +22,9 @@ def process_user_query(
 ):
 
     # Load the system prompt from the file
-    with open(STSTEM_PROMPT_FILE_PATH, "r", encoding="utf-8") as f:
-        system_prompt = f.read()
+    system_prompt = read_prompt_file(STSTEM_PROMPT_FILE_PATH)
+    # with open(STSTEM_PROMPT_FILE_PATH, "r", encoding="utf-8") as f:
+    #     system_prompt = f.read()
 
     # Set the initial messages for the LLM
     messages = [

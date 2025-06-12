@@ -3,6 +3,14 @@ from typing import List, Literal
 from typing import Union
 import pandas as pd
 from data import Dataset
+from app.const import (
+    SUMMARIZE_DEFAULT_BATCH_SIZE,
+    SUMMARIZE_DEFAULT_N_BATCHES,
+    SUMMARIZE_BATCH_PROMPT_FILE_PATH,
+    SUMMARIZE_ALL_BATCHES_PROMPT_FILE_PATH,
+)
+from prompt import read_prompt_file
+from llm import LLM
 
 
 def sum(a: float, b: float) -> float:
@@ -17,15 +25,47 @@ def sum(a: float, b: float) -> float:
     return a + b
 
 
-def summarize(user_request: str, ds: Dataset) -> str:
+def summarize(
+    user_request: str,
+    ds: Dataset,
+    n_batches: int = SUMMARIZE_DEFAULT_N_BATCHES,
+    batch_size: int = SUMMARIZE_DEFAULT_BATCH_SIZE,
+) -> str:
     """
-    Summarize the user request.
+    Summarize a user request using the dataset.
     Args:
         user_request (str): The user request to summarize.
         ds (Dataset): The dataset to use for summarization.
+        n_batches (int): Number of batches to process.
+        batch_size (int): Size of each batch.
     Returns:
         str: A summary of the user request.
     """
+
+    n_rows_to_sample = min(ds.count_rows(), n_batches * batch_size)
+
+    sampled_df = ds.show_examples(n_rows_to_sample)
+
+    summarize_batch_prompt = read_prompt_file(SUMMARIZE_BATCH_PROMPT_FILE_PATH)
+    summarize_all_batches_prompt = read_prompt_file(
+        SUMMARIZE_ALL_BATCHES_PROMPT_FILE_PATH
+    )
+
+    batch_summaries = []
+
+    # for i in range(0, n_rows_to_sample, batch_size):
+    #     batch_df = sampled_df.iloc[i : i + batch_size]
+    #     if batch_df.empty:
+    #         continue
+    #     prompt = summarize_batch_prompt.format(
+    #         user_request=user_request,
+    #         dataset_name=ds.dataset_name,
+    #         examples=batch_df.to_dict(orient="records"),
+    #     )
+    #     # Placeholder for LLM call to summarize the batch
+    #     batch_summary = f"Summary for batch {i // batch_size + 1}: {prompt}"
+    #     batch_summaries.append(batch_summary)
+
     # Placeholder for summarization logic
     return f"Summary of '{user_request}' using dataset {ds.dataset_name}"
 
