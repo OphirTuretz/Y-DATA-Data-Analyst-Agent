@@ -42,32 +42,67 @@ def summarize(
         str: A summary of the user request.
     """
 
+    # Sample rows from the dataset to use for summarization
     n_rows_to_sample = min(ds.count_rows(), n_batches * batch_size)
-
     sampled_df = ds.show_examples(n_rows_to_sample)
 
+    # Read the prompt files for summarization
     summarize_batch_prompt = read_prompt_file(SUMMARIZE_BATCH_PROMPT_FILE_PATH)
     summarize_all_batches_prompt = read_prompt_file(
         SUMMARIZE_ALL_BATCHES_PROMPT_FILE_PATH
     )
 
+    # Initialize a list to hold batch summaries
     batch_summaries = []
 
-    # for i in range(0, n_rows_to_sample, batch_size):
-    #     batch_df = sampled_df.iloc[i : i + batch_size]
-    #     if batch_df.empty:
-    #         continue
-    #     prompt = summarize_batch_prompt.format(
-    #         user_request=user_request,
-    #         dataset_name=ds.dataset_name,
-    #         examples=batch_df.to_dict(orient="records"),
-    #     )
-    #     # Placeholder for LLM call to summarize the batch
-    #     batch_summary = f"Summary for batch {i // batch_size + 1}: {prompt}"
-    #     batch_summaries.append(batch_summary)
+    # Iterate over the sampled DataFrame in batches
+    for i in range(0, n_rows_to_sample, batch_size):
+        batch_df = sampled_df.iloc[i : i + batch_size]
 
-    # Placeholder for summarization logic
-    return f"Summary of '{user_request}' using dataset {ds.dataset_name}"
+        # Each batch prompt is in independent conversation in order to avoid biasing the LLM
+        messages = [
+            {
+                "role": "system",
+                "content": "You are a helpful assistant that summarizes user requests using a dataset.",
+            },
+            {
+                "role": "user",
+                "content": summarize_batch_prompt.format(
+                    user_request=user_request, data=batch_df.to_dict(orient="records")
+                ),
+            },
+        ]
+
+        # Perform the initial request to the LLM
+        response = LLM.perform_request(
+            messages,
+        )
+
+        # Extract the assistant's message from the response
+        batch_summaries.append(response.choices[0].message.content)
+
+    # Combine all batch summaries into a final summary
+    combined_summaries = "\n".join(batch_summaries)
+    final_messages = [
+        {
+            "role": "system",
+            "content": "You are a helpful assistant that summarizes user requests using a dataset.",
+        },
+        {
+            "role": "user",
+            "content": summarize_all_batches_prompt.format(
+                user_request=user_request, summaries=combined_summaries
+            ),
+        },
+    ]
+    # Perform the final request to the LLM
+    final_response = LLM.perform_request(
+        final_messages,
+    )
+    # Extract the final summary from the response
+    final_answer = final_response.choices[0].message.content
+
+    return final_answer
 
 
 def finish(final_answer: str) -> str:
