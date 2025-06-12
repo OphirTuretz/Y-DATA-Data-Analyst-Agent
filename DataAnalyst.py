@@ -29,6 +29,7 @@ if "logs" not in st.session_state:
 st.sidebar.checkbox("Developer Mode", value=False, key="developer_mode")
 
 if st.session_state.developer_mode:
+    st.sidebar.button("Clear Logs", on_click=lambda: st.session_state.logs.clear())
     for message in st.session_state.logs:
         st.sidebar.text(message)
 
