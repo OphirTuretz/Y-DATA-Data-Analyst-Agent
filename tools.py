@@ -356,7 +356,7 @@ tools = [
         "type": "function",
         "function": {
             "name": "finish",
-            "description": "Finish the conversation with a final answer",
+            "description": "Finish the conversation with a final answer. Do not include follow-up prompts, only provide the final answer to the user's original question.",
             "parameters": FinishInput.model_json_schema(),
         },
     },
