@@ -1,7 +1,7 @@
 from llm import LLM
 from data import Dataset
 import tools
-from app.const import STSTEM_PROMPT_FILE_PATH
+from app.const import STSTEM_PROMPT_FILE_PATH, MAX_CALL_DEPTH
 import json
 from typing import Callable
 from prompt import read_prompt_file
@@ -52,8 +52,18 @@ def process_user_query(
     # Extract the assistant's message from the response
     assistant_message = response.choices[0].message
 
+    depth = 0
+
     # Process tool calls if they exist in the assistant's message
     while assistant_message.tool_calls:
+
+        depth += 1
+        if depth > MAX_CALL_DEPTH:
+            log_function("Maximum tool call depth exceeded. Exiting.")
+            return {
+                "response": "Sorry, the request caused too many internal steps and could not be completed.",
+                "dataset": ds,
+            }
 
         # Add the tool calls to the messages
         tool_calls_messages = {

@@ -10,6 +10,8 @@ BASE_URL = "https://api.studio.nebius.com/v1/"
 TEMPERATURE = 0.0
 TOP_P = 1.0
 
+MAX_CALL_DEPTH = 30
+
 SYSTEM_PROMPT_FILE_NAME = "react_agent_system_prompt_v2.txt"
 STSTEM_PROMPT_FILE_PATH = os.path.join("prompts", SYSTEM_PROMPT_FILE_NAME)
 
