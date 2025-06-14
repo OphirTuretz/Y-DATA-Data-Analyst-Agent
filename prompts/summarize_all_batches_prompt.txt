@@ -4,12 +4,12 @@ You are an expert analyst assistant. Your task is to summarize the content of cu
 
 📥 Input  
 You are given:  
-- `user_request`: {{user_request}}  
-- `summaries`: {{summaries}}  
+- `user_request`: {user_request}  
+- `summaries`: {summaries}  
 - `batch_info`: {{
-    "num_batches": {{num_batches}},
-    "rows_per_batch": {{rows_per_batch}},
-    "total_num_of_rows": {{n_rows}}
+    "num_batches": {num_batches},
+    "rows_per_batch": {rows_per_batch},
+    "total_num_of_rows": {n_rows}
 }}
 
 ---
@@ -22,10 +22,10 @@ Follow these principles carefully:
 4. Output should be in the following **structured JSON** format:
 
 ```json
-{
+{{
   "reasoning": "Step-by-step explanation of how you derived the final summary from the batch summaries.",
   "summary": "Final concise summary that answers the user_request clearly and factually."
-}
+}}
 ```
 
 ---
@@ -36,11 +36,11 @@ Follow these principles carefully:
     "Agents typically acknowledge the issue, express regret, and provide refund timelines.",  
     "Most responses include confirmation of refund initiation and estimated processing times."  
   ]  
-- `batch_info`: {
+- `batch_info`: {{
     "num_batches": 2,
     "rows_per_batch": 10,
      "total_num_of_rows": 20
-}
+}}
 
 ---
 

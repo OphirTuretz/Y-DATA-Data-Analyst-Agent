@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Literal
+from typing import List, Literal, Callable
 from typing import Union
 from data import Dataset
 from app.const import (
@@ -30,6 +30,7 @@ def summarize(
     ds: Dataset,
     n_batches: int = SUMMARIZE_DEFAULT_N_BATCHES,
     batch_size: int = SUMMARIZE_DEFAULT_BATCH_SIZE,
+    log_function: Callable[[str], None] = print,
 ) -> str:
     """
     Summarize a user request using the dataset.
@@ -38,6 +39,7 @@ def summarize(
         ds (Dataset): The dataset to use for summarization.
         n_batches (int): Number of batches to process.
         batch_size (int): Size of each batch.
+        log_function (Callable[[str], None]): Function to log messages.
     Returns:
         str: A summary of the user request.
     """
@@ -69,16 +71,23 @@ def summarize(
                 "role": "user",
                 "content": summarize_batch_prompt.format(
                     user_request=user_request,
-                    data=json.dumps(batch_df.to_dict(orient="records"), indent=2),
+                    data=batch_df.to_dict(orient="records"),
                 ),
             },
         ]
+
+        log_function(
+            f"Processing batch {i // batch_size + 1} of {math.ceil(n_rows_to_sample / batch_size)} with {len(batch_df)} rows."
+        )
+        log_function(f"Batch messages: {json.dumps(messages, indent=2)}")
 
         # Perform the initial request to the LLM
         response = LLM.perform_structured_outputs_request(
             messages,
             response_format=SummaryResponse,
         )
+
+        log_function(f"Batch response: {json.dumps(response.model_dump(), indent=2)}")
 
         # Extract the assistant's message from the response
         batch_summaries.append(response.choices[0].message.parsed.summary)
@@ -93,18 +102,24 @@ def summarize(
             "role": "user",
             "content": summarize_all_batches_prompt.format(
                 user_request=user_request,
-                summaries=json.dumps(batch_summaries, indent=2),
+                summaries=batch_summaries,
                 num_batches=str(int(math.ceil(n_rows_to_sample / batch_size))),
                 rows_per_batch=str(int(batch_size)),
                 n_rows=str(int(n_rows_to_sample)),
             ),
         },
     ]
+
+    log_function(f"Final messages: {json.dumps(final_messages, indent=2)}")
+
     # Perform the final request to the LLM
     final_response = LLM.perform_structured_outputs_request(
         final_messages,
         response_format=SummaryResponse,
     )
+
+    log_function(f"Final response: {json.dumps(final_response.model_dump(), indent=2)}")
+
     # Extract the final summary from the response
     final_answer = final_response.choices[0].message.parsed.summary
 

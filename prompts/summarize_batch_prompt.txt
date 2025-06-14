@@ -21,10 +21,10 @@ Each row includes a user instruction and the agent’s response. You will receiv
 📤 Output Format (ALWAYS use this format):
 
 ```json
-{
+{{
   "reasoning": "[Explain how you arrived at the summary based on the batch rows and user request]",
   "summary": "[Write a short, precise summary answering the user request based on this batch]"
-}
+}}
 ```
 
 Do not include any additional explanation outside the JSON. Do not mention that this is only a partial summary.

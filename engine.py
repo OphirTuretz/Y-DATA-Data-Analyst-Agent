@@ -7,15 +7,10 @@ from typing import Callable
 from prompt import read_prompt_file
 
 
-def log_to_console(message: str) -> None:
-    """Logs a message to the console."""
-    print(message)
-
-
 def process_user_query(
     user_query: str,
     ds: Dataset,
-    log_function: Callable[[str], None] = log_to_console,
+    log_function: Callable[[str], None] = print,
     llm_tools=tools.tools,
     llm_tool_choice="auto",
     llm_parallel_tool_calls=True,
