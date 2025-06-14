@@ -1,4 +1,11 @@
-from app.const import MODEL_NAME, BASE_URL, TEMPERATURE, TOP_P
+from app.const import (
+    MODEL_NAME,
+    BASE_URL,
+    TEMPERATURE,
+    TOP_P,
+    DEFAULT_TOOL_CHOICE,
+    DEFAULT_PARALLEL_TOOL_CALLS,
+)
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
@@ -18,8 +25,8 @@ class LLM:
         model: str = MODEL_NAME,
         temperature: float = TEMPERATURE,
         top_p: float = TOP_P,
-        tool_choice: str = None,
-        parallel_tool_calls: bool = False,
+        tool_choice: str = DEFAULT_TOOL_CHOICE,
+        parallel_tool_calls: bool = DEFAULT_PARALLEL_TOOL_CALLS,
     ):
 
         # Initialize OpenAI client
