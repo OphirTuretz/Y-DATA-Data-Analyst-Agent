@@ -13,6 +13,14 @@ from prompt import read_prompt_file
 from llm import LLM
 
 
+class SummaryResponse(BaseModel):
+    reasoning: str = Field(
+        ...,
+        description="Reasoning for the summary.",
+    )
+    summary: str = Field(..., description="The summary of the user request.")
+
+
 def sum(a: float, b: float) -> float:
     """
     Sum two numbers.
@@ -74,8 +82,9 @@ def summarize(
         ]
 
         # Perform the initial request to the LLM
-        response = LLM.perform_request(
+        response = LLM.perform_structured_outputs_request(
             messages,
+            response_format=SummaryResponse,
         )
 
         # Extract the assistant's message from the response
@@ -96,8 +105,9 @@ def summarize(
         },
     ]
     # Perform the final request to the LLM
-    final_response = LLM.perform_request(
+    final_response = LLM.perform_structured_outputs_request(
         final_messages,
+        response_format=SummaryResponse,
     )
     # Extract the final summary from the response
     final_answer = final_response.choices[0].message.content

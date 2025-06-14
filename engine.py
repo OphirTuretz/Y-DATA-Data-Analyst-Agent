@@ -39,7 +39,7 @@ def process_user_query(
     log_function(f"Initial messages: {json.dumps(messages, indent=2)}")
 
     # Perform the initial request to the LLM
-    response = LLM.perform_request(
+    response = LLM.perform_tools_request(
         messages,
         tools=llm_tools,
         tool_choice=llm_tool_choice,
@@ -141,7 +141,7 @@ def process_user_query(
             )
 
         # Perform the next request to the LLM with the updated messages
-        response = LLM.perform_request(
+        response = LLM.perform_tools_request(
             messages,
             tools=llm_tools,
             tool_choice=llm_tool_choice,
