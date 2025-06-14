@@ -52,3 +52,10 @@ cp .env_template .env
 ```bash
 streamlit run DataAnalyst.py
 ```
+
+---
+
+## 🧱 Architecture Diagram
+<p align="center">
+  <img src="images/Architecture_Diagram.svg" alt="" />
+</p>
