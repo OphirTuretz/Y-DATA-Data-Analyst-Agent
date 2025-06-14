@@ -1,7 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import List, Literal
 from typing import Union
-import pandas as pd
 from data import Dataset
 from app.const import (
     SUMMARIZE_DEFAULT_BATCH_SIZE,
@@ -11,26 +10,19 @@ from app.const import (
 )
 from prompt import read_prompt_file
 from llm import LLM
+import json
+import math
 
 
 class SummaryResponse(BaseModel):
     reasoning: str = Field(
         ...,
-        description="Reasoning for the summary.",
+        description="Explain how you arrived at the summary based on user request",
     )
-    summary: str = Field(..., description="The summary of the user request.")
-
-
-def sum(a: float, b: float) -> float:
-    """
-    Sum two numbers.
-    Args:
-        a (float): First number.
-        b (float): Second number.
-    Returns:
-        float: The sum of a and b.
-    """
-    return a + b
+    summary: str = Field(
+        ...,
+        description="Write a short, precise summary answering the user request",
+    )
 
 
 def summarize(
@@ -71,12 +63,13 @@ def summarize(
         messages = [
             {
                 "role": "system",
-                "content": "You are a helpful assistant that summarizes user requests using a dataset.",
+                "content": "You are a helpful analyst that summarizes customer support interactions according to user instructions. Respond in structured JSON.",
             },
             {
                 "role": "user",
                 "content": summarize_batch_prompt.format(
-                    user_request=user_request, data=batch_df.to_dict(orient="records")
+                    user_request=user_request,
+                    data=json.dumps(batch_df.to_dict(orient="records"), indent=2),
                 ),
             },
         ]
@@ -88,19 +81,22 @@ def summarize(
         )
 
         # Extract the assistant's message from the response
-        batch_summaries.append(response.choices[0].message.content)
+        batch_summaries.append(response.choices[0].message.parsed.summary)
 
     # Combine all batch summaries into a final summary
-    combined_summaries = "\n".join(batch_summaries)
     final_messages = [
         {
             "role": "system",
-            "content": "You are a helpful assistant that summarizes user requests using a dataset.",
+            "content": "You are a helpful assistant that summarizes customer support data based on multiple batch summaries, using a structured JSON format.",
         },
         {
             "role": "user",
             "content": summarize_all_batches_prompt.format(
-                user_request=user_request, summaries=combined_summaries
+                user_request=user_request,
+                summaries=json.dumps(batch_summaries, indent=2),
+                num_batches=str(int(math.ceil(n_rows_to_sample / batch_size))),
+                rows_per_batch=str(int(batch_size)),
+                n_rows=str(int(n_rows_to_sample)),
             ),
         },
     ]
@@ -110,9 +106,21 @@ def summarize(
         response_format=SummaryResponse,
     )
     # Extract the final summary from the response
-    final_answer = final_response.choices[0].message.content
+    final_answer = final_response.choices[0].message.parsed.summary
 
     return final_answer
+
+
+def sum(a: float, b: float) -> float:
+    """
+    Sum two numbers.
+    Args:
+        a (float): First number.
+        b (float): Second number.
+    Returns:
+        float: The sum of a and b.
+    """
+    return a + b
 
 
 def finish(final_answer: str) -> str:
