@@ -365,7 +365,7 @@ tools = [
         "type": "function",
         "function": {
             "name": "select_semantic_intent",
-            "description": "Select rows from the dataset where the 'intent' column matches any of the provided intent names",
+            "description": "Filter rows from the dataset where the 'intent' column matches any of the provided intent names",
             "parameters": SelectSemanticIntentInput.model_json_schema(),
         },
     },
@@ -373,7 +373,7 @@ tools = [
         "type": "function",
         "function": {
             "name": "select_semantic_category",
-            "description": "Select rows from the dataset where the 'category' column matches any of the provided category names",
+            "description": "Filter rows from the dataset where the 'category' column matches any of the provided category names",
             "parameters": SelectSemanticCategoryInput.model_json_schema(),
         },
     },
