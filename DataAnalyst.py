@@ -94,7 +94,7 @@ if st.session_state.submitted:
             log(f"Generated response: '{st.session_state.response}'")
 
     st.markdown("### 💬 Agent Response")
-    st.write(st.session_state.response)
+    st.write(f"""{st.session_state.response}""")
 
     st.button("Ask a new question", on_click=on_reset_click)
 
