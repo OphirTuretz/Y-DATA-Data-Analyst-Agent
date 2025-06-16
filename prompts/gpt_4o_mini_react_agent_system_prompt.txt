@@ -28,6 +28,8 @@ Use `get_possible_categories` and `get_possible_intents` to discover valid value
 - If filtering is needed before `show_examples` or `summarize`, use only `select_semantic_category` or `select_semantic_intent` and set the `function_type` explicitly to the correct tool name — do **not** use `"filter"` as a function type
 - For counts or math, always call tools like `count_*` or `sum` — never compute internally
 - When answering questions about the most frequent categories or intents, **always sort them by count and only present the top results (e.g., top 3–5)**
+- Before counting categories or intents, always call `get_possible_categories` or `get_possible_intents` to determine the valid values
+- Only call `count_rows` if the total number of rows is directly relevant to answering the question or making a decision (e.g., checking dataset size). Avoid unnecessary tool calls
 - If the user’s question is irrelevant or out of scope, respond using `finish(...)` with a polite, grounded message that explicitly states the question is out of scope for this dataset. Never respond directly via message content.
 
 ---
