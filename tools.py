@@ -126,6 +126,18 @@ def summarize(
     return final_answer
 
 
+def sort_dict_by_values(d: dict, ascending: bool = False) -> dict:
+    """
+    Sort a dictionary by its values.
+    Args:
+        d (dict): The dictionary to sort.
+        ascending (bool): Whether to sort in ascending order. Defaults to False.
+    Returns:
+        dict: A new dictionary sorted by values.
+    """
+    return dict(sorted(d.items(), key=lambda item: item[1], reverse=not ascending))
+
+
 def sum(a: float, b: float) -> float:
     """
     Sum two numbers.
@@ -217,12 +229,25 @@ class CountRowsInput(BaseModel):
     function_type: Literal["count_rows"]
 
 
+class SortDictByValuesInput(BaseModel):
+    reasoning: str = Field(..., description="Reasoning for the function call.")
+    function_type: Literal["sort_dict_by_values"]
+    d: str = Field(
+        ...,
+        description="a JSON data object that can be translated to dictionary by json.loads() to sort by its values.",
+    )
+    ascending: bool = Field(
+        False, description="Whether to sort in ascending order. Defaults to False."
+    )
+
+
 FunctionType = Union[
     GetPossibleIntentsInput,
     GetPossibleCategoriesInput,
     SelectSemanticIntentInput,
     SelectSemanticCategoryInput,
     SumInput,
+    SortDictByValuesInput,
     CountCategoryInput,
     CountIntentInput,
     ShowExamplesInput,
@@ -276,6 +301,12 @@ def execute_function(function_call: FunctionType, ds: Dataset):
     elif isinstance(function_call, SumInput):
         result = sum(function_call.a, function_call.b)
         output["response"] = {"sum": result}
+        return output
+    elif isinstance(function_call, SortDictByValuesInput):
+        sorted_dict = sort_dict_by_values(
+            json.loads(function_call.d), ascending=function_call.ascending
+        )
+        output["response"] = {"sorted_dict": sorted_dict}
         return output
     elif isinstance(function_call, CountCategoryInput):
         count = ds.count_category(function_call.category)
@@ -383,6 +414,17 @@ tools = [
             "name": "sum",
             "description": "Sum two numbers",
             "parameters": SumInput.model_json_schema(),
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "sort_dict_by_values",
+            "description": (
+                "Sort a dictionary by its values. "
+                "The dictionary is provided as input."
+            ),
+            "parameters": SortDictByValuesInput.model_json_schema(),
         },
     },
     {
