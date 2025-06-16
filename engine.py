@@ -1,7 +1,12 @@
 from llm import LLM
 from data import Dataset
 import tools
-from app.const import STSTEM_PROMPT_FILE_PATH, MAX_CALL_DEPTH
+from app.const import (
+    STSTEM_PROMPT_FILE_PATH,
+    MAX_CALL_DEPTH,
+    DEFAULT_PARALLEL_TOOL_CALLS,
+    DEFAULT_TOOL_CHOICE,
+)
 import json
 from typing import Callable
 from prompt import read_prompt_file
@@ -12,8 +17,8 @@ def process_user_query(
     ds: Dataset,
     log_function: Callable[[str], None] = print,
     llm_tools=tools.tools,
-    llm_tool_choice="auto",
-    llm_parallel_tool_calls=True,
+    llm_tool_choice=DEFAULT_TOOL_CHOICE,
+    llm_parallel_tool_calls=DEFAULT_PARALLEL_TOOL_CALLS,
 ):
 
     # Load the system prompt from the file

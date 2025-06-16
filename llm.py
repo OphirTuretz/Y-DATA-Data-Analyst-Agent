@@ -5,6 +5,7 @@ from app.const import (
     TOP_P,
     DEFAULT_TOOL_CHOICE,
     DEFAULT_PARALLEL_TOOL_CALLS,
+    API_KEY_ENV_VAR,
 )
 from openai import OpenAI
 from dotenv import load_dotenv
@@ -32,7 +33,7 @@ class LLM:
         # Initialize OpenAI client
         client = OpenAI(
             base_url=base_url,
-            api_key=os.getenv("NEBIUS_STUDIO_API_KEY"),
+            api_key=os.getenv(API_KEY_ENV_VAR),
         )
 
         response = client.chat.completions.create(
@@ -61,7 +62,7 @@ class LLM:
         # Initialize OpenAI client
         client = OpenAI(
             base_url=base_url,
-            api_key=os.getenv("NEBIUS_STUDIO_API_KEY"),
+            api_key=os.getenv(API_KEY_ENV_VAR),
         )
 
         response = client.beta.chat.completions.parse(
